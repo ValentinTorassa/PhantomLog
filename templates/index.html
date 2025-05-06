@@ -3,87 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Panel de Tracking - Consulting IT</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Phantom Click - Consulting IT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-light">
+<body class="bg-gray-100 text-gray-800">
 
-<div class="container py-5">
-  <h1 class="mb-4">Phantom Click</h1>
+  <div class="max-w-5xl mx-auto py-10 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center text-indigo-700">Phantom Click</h1>
 
-<!-- Generador de Link -->
-<div class="card mb-4">
-  <div class="card-body">
-    <h5 class="card-title">Generar nuevo link de rastreo</h5>
-    <form method="post" action="/generate" class="d-flex">
-      <input type="text" name="user_id" class="form-control me-2" placeholder="ID del empleado (ej: juan.rrhh)" required>
-      <button type="submit" class="btn btn-primary">Generar</button>
-    </form>
-  </div>
-</div>
+    <!-- Generador de Link -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">🎯 Generar nuevo link de rastreo</h2>
+      <form method="post" action="/generate" class="flex flex-col sm:flex-row gap-4">
+        <input type="text" name="user_id" placeholder="ID del empleado (ej: juan.rrhh)"
+               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-indigo-300" required>
+        <button type="submit"
+                class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Generar</button>
+      </form>
+    </div>
 
-  <!-- Tabla de registros -->
-  <h5 class="card-title">Logs de acceso detectados</h5>
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered">
-      <thead class="table-dark">
-        <tr>
-          <th>Fecha/Hora</th>
-          <th>ID Usuario</th>
-          <th>IP</th>
-          <th>User-Agent</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if logs|length == 0 %}
-          <tr><td colspan="4" class="text-center text-muted">Sin accesos registrados aún.</td></tr>
-        {% else %}
-          {% for row in logs %}
+    <!-- Tabla de logs -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">🗂️ Logs de acceso detectados</h2>
+      <div class="overflow-auto">
+        <table class="w-full text-sm table-auto border-collapse">
+          <thead class="bg-indigo-600 text-white">
             <tr>
-              <td>{{ row[0] }}</td>
-              <td>{{ row[1] }}</td>
-              <td>{{ row[2] }}</td>
-              <td>{{ row[3] }}</td>
+              <th class="px-4 py-2 text-left">Fecha/Hora</th>
+              <th class="px-4 py-2 text-left">ID Usuario</th>
+              <th class="px-4 py-2 text-left">IP</th>
+              <th class="px-4 py-2 text-left">User-Agent</th>
             </tr>
-          {% endfor %}
-        {% endif %}
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+            {% if logs|length == 0 %}
+              <tr><td colspan="4" class="text-center text-gray-400 py-4">Sin accesos registrados aún.</td></tr>
+            {% else %}
+              {% for row in logs %}
+                <tr class="border-b">
+                  <td class="px-4 py-2">{{ row[0] }}</td>
+                  <td class="px-4 py-2">{{ row[1] }}</td>
+                  <td class="px-4 py-2">{{ row[2] }}</td>
+                  <td class="px-4 py-2">{{ row[3] }}</td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla de links generados -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">🔗 Links generados</h2>
+      <div class="overflow-auto">
+        <table class="w-full text-sm table-auto border-collapse">
+          <thead class="bg-indigo-100 text-indigo-800">
+            <tr>
+              <th class="px-4 py-2 text-left">ID Usuario</th>
+              <th class="px-4 py-2 text-left">Link de rastreo</th>
+              <th class="px-4 py-2 text-left">Copiar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if links|length == 0 %}
+              <tr><td colspan="3" class="text-center text-gray-400 py-4">No hay links generados aún.</td></tr>
+            {% else %}
+              {% for user_id, full_url in links %}
+                <tr class="border-b">
+                  <td class="px-4 py-2">{{ user_id }}</td>
+                  <td class="px-4 py-2 text-blue-600 hover:underline"><a href="{{ full_url }}" target="_blank">{{ full_url }}</a></td>
+                  <td class="px-4 py-2">
+                    <button onclick="navigator.clipboard.writeText('{{ full_url }}')"
+                            class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 transition text-sm">📋 Copiar</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  
-
-<!-- Tabla de links generados -->
-<h5 class="card-title">Links generados</h5>
-<div class="table-responsive">
-  <table class="table table-striped table-bordered">
-    <thead class="table-info">
-      <tr>
-        <th>ID Usuario</th>
-        <th>Link de rastreo</th>
-        <th>Copiar</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% if links|length == 0 %}
-        <tr><td colspan="3" class="text-center text-muted">No hay links generados aún.</td></tr>
-      {% else %}
-        {% for user_id, full_url in links %}
-          <tr>
-            <td>{{ user_id }}</td>
-            <td><a href="{{ full_url }}" target="_blank">{{ full_url }}</a></td>
-            <td>
-              <button class="btn btn-sm btn-outline-secondary"
-                      onclick="navigator.clipboard.writeText('{{ full_url }}')">📋</button>
-            </td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </tbody>
-  </table>
-</div>
-
-  
-
 
 </body>
 </html>
