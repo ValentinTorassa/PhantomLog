@@ -5,3 +5,10 @@ __pycache__/
 .venv/
 venv/
 env/
+.env
+.pytest_cache/
+
+# Runtime data (created on first run)
+logs.csv
+links.csv
+/data/
