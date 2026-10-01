@@ -1,18 +1,90 @@
-# 🕵️ Phantom Click
+# 🕵️ PhantomLog
 
-**Phantom Click** es una herramienta simple para rastrear accesos a enlaces y archivos cebo. Pensada para pruebas internas de seguridad, simulaciones de phishing y auditorías de concientización.
+A tiny Flask click-tracker for **authorized** phishing-simulation and
+security-awareness exercises. Generate a unique tracking link per target, and
+when someone opens it, PhantomLog records the click (timestamp, id, IP,
+user-agent) and shows it on a password-protected dashboard.
 
----
+## What it does
 
-## 🚀 ¿Qué hace?
+- Generates a unique link per user (`/log?id=<uuid>`).
+- Logs who clicked, from which IP and with what device.
+- Shows logs and generated links on a dark-mode web dashboard.
+- Dashboard is behind HTTP Basic auth; the tracking endpoint stays public.
 
-- Genera links únicos por usuario
-- Registra quién hizo clic, desde dónde y con qué dispositivo
-- Muestra todo en un panel web moderno (modo oscuro 🌑)
-- Copiás los links con un clic y listo
+## Routes
 
----
-🌐 Deploy fácil
+| Route        | Auth   | Purpose                                  |
+|--------------|--------|------------------------------------------|
+| `/`          | admin  | Dashboard: view logs and generated links |
+| `/generate`  | admin  | Create a new tracking link (POST)        |
+| `/log?id=…`  | public | Tracking endpoint (records a click, 204) |
 
-¿Querés que funcione desde cualquier lugar? Subilo a Render y usalo como una app online para tus campañas.
+## Run locally
 
+```bash
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+
+# Configure admin credentials (see "Configuration" below)
+export ADMIN_USER=admin
+export ADMIN_PASSWORD_HASH="$(python -c 'from werkzeug.security import generate_password_hash as g; import getpass; print(g(getpass.getpass()))')"
+
+python app.py   # dev server on http://0.0.0.0:5000
+```
+
+`logs.csv` and `links.csv` are created on first run inside `DATA_DIR`.
+
+## Configuration
+
+All configuration is via environment variables (see `.env.example`):
+
+| Variable              | Required | Default        | Notes                                             |
+|-----------------------|----------|----------------|---------------------------------------------------|
+| `ADMIN_USER`          | no       | `admin`        | Dashboard username (HTTP Basic).                  |
+| `ADMIN_PASSWORD_HASH` | **yes**  | —              | Werkzeug password hash. No default; see below.    |
+| `DATA_DIR`            | no       | app directory  | Where `logs.csv` / `links.csv` live.              |
+
+There is **no default password**. Until `ADMIN_PASSWORD_HASH` is set, the
+dashboard returns `503`; the public `/log` endpoint keeps working. Credentials
+are checked with a constant-time comparison. Generate a hash with:
+
+```bash
+python -c "from werkzeug.security import generate_password_hash as g; import getpass; print(g(getpass.getpass()))"
+```
+
+## Deploy
+
+A `Procfile` is included, so any Procfile-based host (Render, Railway, etc.)
+works out of the box:
+
+```
+web: gunicorn app:app
+```
+
+Set `ADMIN_USER`, `ADMIN_PASSWORD_HASH` and (optionally) `DATA_DIR` in the host's
+environment, and a persistent disk for `DATA_DIR` if you want logs to survive
+restarts. **Always serve behind HTTPS** — HTTP Basic credentials are otherwise
+sent in the clear.
+
+## Tests
+
+```bash
+pip install -r requirements.txt
+pytest -q
+```
+
+CI runs the same suite on every push and pull request (see
+`.github/workflows/ci.yml`).
+
+## Ethics & scope
+
+PhantomLog is for **authorized** security-awareness testing only — exercises you
+or your client have explicit written permission to run. Do not use it to track,
+deceive or profile anyone without authorization.
+
+- **Data collected:** timestamp, the `id` from the link, source IP and
+  User-Agent of each click. No cookies, no payloads, no page contents.
+- **Retention:** data lives in plain CSV files under `DATA_DIR`. Treat it as
+  personal data: restrict access, delete it when the exercise ends, and keep it
+  only as long as the engagement requires.
