@@ -77,6 +77,20 @@ pytest -q
 CI runs the same suite on every push and pull request (see
 `.github/workflows/ci.yml`).
 
+## Used as a lab in Open Security Labs
+
+PhantomLog's code is also the environment for the lab
+[Medir una simulación de phishing sin vigilar a nadie](https://securitylabs.valentorassa.com/labs/ciberseguridad/medir-simulacion-phishing/)
+("Measuring a phishing simulation without surveilling anyone") in
+[Open-Security-Labs](https://github.com/ValentinTorassa/Open-Security-Labs).
+The copy there lives under
+[`entornos/ciberseguridad/medir-simulacion-phishing/phantomlog/`](https://github.com/ValentinTorassa/Open-Security-Labs/tree/main/entornos/ciberseguridad/medir-simulacion-phishing)
+and adds, for teaching: opt-in `ProxyFix` behind `TRUSTED_PROXIES`, an HTTP
+`method` column in the log, UTC timestamps, and tests for each change. The lab
+covers authorization, aggregate-only reporting, filtering scanner and
+link-preview clicks, and the `remote_addr`-behind-a-proxy pitfall. That repo's
+environment README explains every change.
+
 ## Ethics & scope
 
 PhantomLog is for **authorized** security-awareness testing only — exercises you
