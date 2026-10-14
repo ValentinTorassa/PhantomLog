@@ -102,3 +102,7 @@ deceive or profile anyone without authorization.
 - **Retention:** data lives in plain CSV files under `DATA_DIR`. Treat it as
   personal data: restrict access, delete it when the exercise ends, and keep it
   only as long as the engagement requires.
+
+## License
+
+Apache 2.0, see [LICENSE](LICENSE).
